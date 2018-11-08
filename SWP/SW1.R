@@ -70,3 +70,10 @@ socialDemographicstb[,.N, by = .(State, Gender, nKids)][order(State,nKids)]
 socialDemographicstb
 
 ggplot(socialDemographicstb, aes(x = Occupation, fill = Sport)) + geom_bar()
+
+ggplot(socialDemographicstb, aes(x = State, fill =Gender )) + geom_bar()
+summary(socialDemographicstb)
+boxplot(socialDemographicstb$Age)
+
+table (socialDemographicstb %>% group_by(Occupation) %>% summarise(cout = n()))
+
