@@ -131,3 +131,14 @@ ggplot(everConsumedClean, aes(x = CBar)) + geom_bar() + coord_flip()
 ggplot(placeClean, aes(x = Place)) + geom_bar()
 ggplot(frequencyClean, aes( x =Frequency)) + geom_bar()
 
+# check if the places where people buy chocolate differ by consumption rate
+
+frequencyPlace = cleanJoinedConsumption %>% select( N,Place, Frequency) %>% distinct(.)
+
+table(frequencyPlace$Place, frequencyPlace$Frequency)
+
+# we can say that people who eat most of the chocolate tend to buy it in
+# superkaret
+
+
+
