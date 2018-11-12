@@ -76,5 +76,41 @@ summary(socialDemographicstb)
 boxplot(socialDemographicstb$Age)
 
 
-table(socialDemographicstb$State)
+socialDemographicstb %>% group_by(State) %>% summarise(n = n())  %>% mutate(n/sum(n))
+socialDemographicstb %>% group_by(Sport) %>% summarise(n = n())  %>% mutate(n/sum(n))
+socialDemographicstb %>% group_by(mStatus) %>% summarise(n = n())  %>% mutate(n/sum(n))
+
+socialDemographicstb
+
+socialDataOverConsumption  = left_join(socialDemographicstb, cleanJoinedConsumption, by ="N")
+
+# check how people who eat chocolate correlates with how people follow sport
+sportConsumption = socialDataOverConsumption %>% select(N,Sport, Frequency) %>% distinct(.)
+
+
+ftable(sportConsumption$Frequency,sportConsumption$Sport)
+
+#check if the consumption rates differ by marital status
+
+mStatusConsumptuon = socialDataOverConsumption %>% select(N,mStatus, Frequency) %>% distinct(.)
+
+table(mStatusConsumptuon$Frequency, mStatusConsumptuon$mStatus)
+
+#check if the consumption reasons differ by marital status
+
+mStatusReason =  socialDataOverConsumption %>% select(N,mStatus,Reason ) %>% distinct(.)
+
+tb = table(mStatusReason$Reason, mStatusReason$mStatus)
+round(prop.table(tb,2),digits = 2)
+
+#childrenConsumption
+
+childrenConsumption =  socialDataOverConsumption  %>% na.omit() %>% select(N,nKids,Frequency) %>% distinct(.) 
+
+tb = table(childrenConsumption$Frequency, childrenConsumption$nKids )
+
+# report of missing values. 
+
+socialDataOverConsumption %>% distinct(N,nKids) %>% group_by(nKids) %>%summarize(n())
+
 

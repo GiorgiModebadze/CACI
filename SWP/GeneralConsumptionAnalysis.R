@@ -140,3 +140,22 @@ table(frequencyPlace$Place, frequencyPlace$Frequency)
 # we can say that people who eat most of the chocolate tend to buy it in
 # superkaret
 
+reasonClean %>% group_by(Reason) %>% summarize(count = n()) %>% 
+  mutate( prc = count /50)%>% arrange(desc(count))
+
+
+frequencyClean
+
+tb = frequencyClean %>% group_by(Frequency) %>% summarize(count = n()) %>% 
+  mutate(prc = paste( prc = count /50, "%"))%>% arrange(desc(count)) %>% 
+  select(Frequency, prc) %>% arrange(prc)
+
+ggplot(tb, aes(x= Frequency, y = prc)) + geom_col() + coord_flip() +
+  ylab("percentage")
+
+# lets check if the people from villages explisit different preferences than from
+# cities
+names(socialDataOverConsumption)
+tb = socialDataOverConsumption %>% select(N,LivingPlace,Place) %>% distinct(.)
+
+round(prop.table(table(tb$LivingPlace, tb$Place),1),2)
