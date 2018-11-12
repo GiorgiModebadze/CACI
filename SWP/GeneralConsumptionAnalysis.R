@@ -159,3 +159,4 @@ names(socialDataOverConsumption)
 tb = socialDataOverConsumption %>% select(N,LivingPlace,Place) %>% distinct(.)
 
 round(prop.table(table(tb$LivingPlace, tb$Place),1),2)
+
