@@ -26,6 +26,10 @@ means <- aggregate(values ~ ind , b, mean)
 
 
 ggplot(stack(directPreferanceData[-1]) ,aes(x = ind ,y = values)) + geom_boxplot()+ 
-  coord_flip() + 
+  coord_flip() 
   stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3,show.legend  = FALSE) +
   geom_text(data = means, aes(label = values, y = values - 0.3)) 
+
+
+menasbyRow =tibble(N = 1:50, rMean = directPreferanceData[-1] %>% rowMeans())
+
