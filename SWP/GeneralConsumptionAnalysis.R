@@ -140,5 +140,3 @@ table(frequencyPlace$Place, frequencyPlace$Frequency)
 # we can say that people who eat most of the chocolate tend to buy it in
 # superkaret
 
-
-

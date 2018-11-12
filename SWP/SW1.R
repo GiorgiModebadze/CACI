@@ -75,5 +75,6 @@ ggplot(socialDemographicstb, aes(x = State, fill =Gender )) + geom_bar()
 summary(socialDemographicstb)
 boxplot(socialDemographicstb$Age)
 
-table (socialDemographicstb %>% group_by(Occupation) %>% summarise(cout = n()))
+
+table(socialDemographicstb$State)
 
