@@ -42,5 +42,5 @@ gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>%
   group_by(Attribute) %>% filter(mean == min(mean))
 
 
-
-
+summary(attributesRating)
+sapply(attributesRating, function(x) sum(is.na(x)))
