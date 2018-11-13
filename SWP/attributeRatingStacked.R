@@ -41,11 +41,14 @@ gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>%
 gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>% 
   group_by(Attribute) %>% filter(mean == min(mean))
 
+<<<<<<< HEAD
 
 
 summary(attributesRating)
 sapply(attributesRating, function(x) sum(is.na(x)))
 
+=======
+>>>>>>> 56848e65b8d8850b5086f3f90071cce54288fcd1
 missing = sapply(attributesRating, function(x) sum(is.na(x)))
 missing = missing[-1]
 missing = missing[-1]
@@ -65,6 +68,7 @@ missing1 = c(sum(sapply(filter(attributesRating,Product =="Snickers"),function(x
 names(missing1) = c ("Snickers","KinderBueno","Twix","Mars","KitKat","Bounty","KinderRiegel","Balisto","Lion","Duplo")
 missing1
 barplot(missing1)
+<<<<<<< HEAD
 
 
 
@@ -79,3 +83,5 @@ gatheredNA =   gather(spread,"cat","nas", - Product )
 gatheredNA
 
 ggplot(gatheredNA, aes(x = cat, y = nas, col = Product)) + geom_col() + coord_flip()
+=======
+>>>>>>> 56848e65b8d8850b5086f3f90071cce54288fcd1
