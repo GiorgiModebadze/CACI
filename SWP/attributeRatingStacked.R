@@ -41,6 +41,26 @@ gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>%
 gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>% 
   group_by(Attribute) %>% filter(mean == min(mean))
 
+<<<<<<< HEAD
 
 summary(attributesRating)
 sapply(attributesRating, function(x) sum(is.na(x)))
+=======
+missing = sapply(attributesRating, function(x) sum(is.na(x)))
+missing = missing[-1]
+missing = missing[-1]
+sum(sapply(filter(attributesRating,Product =="Duplo"),function(x) sum(is.na(x))))
+missing1 = c(sum(sapply(filter(attributesRating,Product =="Snickers"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="KinderBueno"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Twix"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Mars"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="KitKat"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Bounty"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="KinderRiegel"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Balisto"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Lion"),function(x) sum(is.na(x)))),
+             sum(sapply(filter(attributesRating,Product =="Duplo"),function(x) sum(is.na(x)))))
+names(missing1) = c ("Snickers","KinderBueno","Twix","Mars","KitKat","Bounty","KinderRiegel","Balisto","Lion","Duplo")
+missing1
+barplot(missing1)
+>>>>>>> a71fd8fab581d31dcbd6404b7ac5ddcfcb200125
