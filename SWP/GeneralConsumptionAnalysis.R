@@ -129,7 +129,7 @@ rm(tb)
 ggplot(reasonClean , aes(x= Reason)) + geom_bar() + coord_flip() 
 ggplot(everConsumedClean, aes(x = CBar)) + geom_bar() + coord_flip()
 ggplot(placeClean, aes(x = Place)) + geom_bar()
-ggplot(frequencyClean, aes( x =Frequency)) + geom_bar()
+ggplot(frequencyClean, aes( x =Frequency, col = Frequency)) + geom_bar(position = "fill")
 
 # check if the places where people buy chocolate differ by consumption rate
 
@@ -137,9 +137,19 @@ frequencyPlace = cleanJoinedConsumption %>% select( N,Place, Frequency) %>% dist
 
 table(frequencyPlace$Place, frequencyPlace$Frequency)
 
+
+forpie = frequencyClean %>% group_by(Frequency) %>% summarize(count = n()) %>%
+  mutate(Label = paste(Frequency, count/sum(count) * 100,"%", sep=" " )) %>% 
+  arrange(count)
+
+pie(forpie$count, labels = forpie$Label, 
+    main = "How often do you eat chocolate?")
+
+?pie
 # we can say that people who eat most of the chocolate tend to buy it in
 # superkaret
 
+forpie
 reasonClean %>% group_by(Reason) %>% summarize(count = n()) %>% 
   mutate( prc = count /50)%>% arrange(desc(count))
 

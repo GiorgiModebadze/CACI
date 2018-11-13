@@ -82,6 +82,4 @@ spread[is.na(spread)] <-0
 gatheredNA =   gather(spread,"cat","nas", - Product )
 gatheredNA
 
-ggplot(gatheredNA, aes(x = cat, y = nas, col = Product)) + geom_col() + coord_flip()
-=======
->>>>>>> 56848e65b8d8850b5086f3f90071cce54288fcd1
+ggplot(gatheredNA, aes(x = Product, y = nas)) + geom_col() + coord_flip() + ylab (" Number of missing")
