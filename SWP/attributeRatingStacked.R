@@ -41,14 +41,16 @@ gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>%
 gd %>% group_by(Product, Attribute) %>% summarise(mean = mean(Vals))%>% 
   group_by(Attribute) %>% filter(mean == min(mean))
 
-<<<<<<< HEAD
+
 
 summary(attributesRating)
 sapply(attributesRating, function(x) sum(is.na(x)))
-=======
+
 missing = sapply(attributesRating, function(x) sum(is.na(x)))
 missing = missing[-1]
 missing = missing[-1]
+
+
 sum(sapply(filter(attributesRating,Product =="Duplo"),function(x) sum(is.na(x))))
 missing1 = c(sum(sapply(filter(attributesRating,Product =="Snickers"),function(x) sum(is.na(x)))),
              sum(sapply(filter(attributesRating,Product =="KinderBueno"),function(x) sum(is.na(x)))),
@@ -63,4 +65,17 @@ missing1 = c(sum(sapply(filter(attributesRating,Product =="Snickers"),function(x
 names(missing1) = c ("Snickers","KinderBueno","Twix","Mars","KitKat","Bounty","KinderRiegel","Balisto","Lion","Duplo")
 missing1
 barplot(missing1)
->>>>>>> a71fd8fab581d31dcbd6404b7ac5ddcfcb200125
+
+
+
+
+gather = gatheredData %>% filter( is.na(Vals)) %>% group_by(Product,Attribute) %>% summarize( c = sum(is.na(Vals)))
+
+spread = spread(gather, Product, c,)
+
+spread[is.na(spread)] <-0
+
+gatheredNA =   gather(spread,"cat","nas", - Product )
+gatheredNA
+
+ggplot(gatheredNA, aes(x = cat, y = nas, col = Product)) + geom_col() + coord_flip()
