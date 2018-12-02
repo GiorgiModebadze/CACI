@@ -67,3 +67,30 @@ semPaths(brand.fa.ob, what="est", residuals=FALSE,
 
 # PCA BI plot
 
+
+a.pca<-principal(bars[,3:15],nfactors=2)
+a.pca$values
+biplot(a.pca)
+plot(a.pca$values)
+a.pca
+str(a.pca$score)
+aggregate(a.pca$scores, by=list(bars$Product),mean, na.rm=TRUE)
+
+str(bars.dt.2)
+brand.sc <- bars.dt.2
+brand.mean <- aggregate(. ~ Product, data=brand.sc, mean)
+brand.mean
+rownames(brand.mean) <- brand.mean[, 1]
+brand.mean <- brand.mean[, -1] 
+brand.mean
+brand.mu.pc <- prcomp(brand.mean, scale=TRUE)
+
+heatmap.2(as.matrix(brand.mean),
+                   col=brewer.pal(9, "GnBu"), trace="none", key=FALSE, dend="none",
+                   main="\n\n\n\n\nBrand attributes")
+
+
+biplot(brand.mu.pc, main="Brand positioning",
+       cex = 0.5)
+
+?biplot
