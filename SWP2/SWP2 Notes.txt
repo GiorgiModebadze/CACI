@@ -2,15 +2,30 @@ R HomeWork
 
 Most likely we are taking non-metric approach. We should give it a good explanation
 
+Proposition: Maybe Include some comparison by gender
+
 P1:
 	1) How we prepared data and what is it about? ??Methodolgy (1)
 	2) Euclidean distances between the 10 chocolate bars  (1)
 	3) Report the similarity matrices in the appendix (Find out more)(0)
 	4) 2-dimensional perceptual map based on the Multidimensional Scaling Method (1)
-	5) 
+	5) Explain your estimation approach https://www.simfit.org.uk/metric_and_non-metric_scaling.pdf (1)
+
+P2: 
+	1) Find out which is better Factor Analysis or Principal component analysis (0)
+	2) 
+
 
 
 useful resources: 
 
 1) https://www.displayr.com/singular-value-decomposition-in-r/
 2) https://www.simfit.org.uk/metric_and_non-metric_scaling.pdf
+3) http://www.analytictech.com/borgatti/profit.htm
+4) https://www.youtube.com/watch?v=FgakZw6K1QQ
+5) https://sites.google.com/site/econometricsacademy/econometrics-models/principal-component-analysis
+6) https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues
+7) http://www.cs.otago.ac.nz/cosc453/student_tutorials/principal_components.pdf   (from chapter 3)
+
+?? Should we use all attributes or only some
+?? Rado thinks that PCA is better than Factor analysis. We will need to prove it.
