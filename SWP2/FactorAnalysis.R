@@ -2,6 +2,8 @@
 getwd()
 rm(list = ls())
 
+install.packages("vegan")
+library(vegan)
 library(cluster)
 library(readxl)
 library(nFactors)
@@ -9,8 +11,11 @@ library(tidyverse)
 library(GPArotation)
 library(psych)
 
+getwd()
 # read Data
-dat <-read_excel("SWP/Data_Chocolate_allinterviews.xlsx", sheet = "AttributeRatingsStacked")
+
+dat <-read_excel("/Users/Raviky/Documents/GitHub/CACI/SWP/Data_Chocolate_allinterviews.xlsx", 
+                 sheet = "AttributeRatingsStacked")
 dat<-as.data.frame(dat)
 str(dat)
 head(dat)
