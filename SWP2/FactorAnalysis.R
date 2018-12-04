@@ -1,6 +1,8 @@
 
+getwd()
 rm(list = ls())
 
+library(cluster)
 library(readxl)
 library(nFactors)
 library(tidyverse)
@@ -11,8 +13,11 @@ library(psych)
 dat <-read_excel("SWP/Data_Chocolate_allinterviews.xlsx", sheet = "AttributeRatingsStacked")
 dat<-as.data.frame(dat)
 str(dat)
+head(dat)
 bars<-dat
-summary(dat)
+#finding outliers
+bars.dt.long %>% filter(!is.na(Value) & Product == "KitKat" & Attribute == "crunchy") %>% group_by(Product, Attribute) %>%
+  summarise(mean = mean( Value) )
 
 aggregate(dat[,-c(1,2)], by=list(bars$Product),mean, na.rm=TRUE)
 
@@ -21,7 +26,7 @@ library(data.table)
 bars.dt = as.data.table(bars)
 # melt data.table to "long" format
 bars.dt.long = melt(bars.dt, id.vars = c("Person", "Product"), 
-                    variable.name = "Attribute", value.name = "Value")
+                    variable.name = "Attribute", value.name = "Value") 
 str(bars.dt.long)
 head(bars.dt.long)
 # mean values for each attribute (by each product and attribute)
@@ -42,19 +47,21 @@ bars.dt.2 = dcast(bars.dt.long, Person + Product ~ Attribute, value.var = "Value
 # check eigenvalues
 
 eigen(cor(bars.dt.2[,3:15]))$values
-plot(eigen(cor(bars.dt.2[,3:15]))$values)
+plot(eigen(cor(bars.dt.2[,3:15]))$values, ylab = "eigen",
+     main = "Number of Factors")
+abline( h = 1, col = "red",)
 
 a.fa. <- fa(bars.dt.2[,3:15],fm="ml", max.iter=1000,SMC=TRUE,scores='Anderson',nfactors=5, 
           rotate ="varimax")
 
-
+a.fa.
 
 
 library(gplots)
 library(RColorBrewer)
 library(semPlot)
-heatmap.2(a.fa.$loadings,col=brewer.pal(9, "Greens"), trace="none", key=FALSE, dend="none",
-          Colv=FALSE, cexCol = 1.0,
+heatmap(a.fa.$loadings,col=brewer.pal(9, "Greens"), trace="none", key=FALSE, dend="none",
+          Colv=FALSE,
           main="Factor loadings for brand adjectives")
 
 
@@ -83,14 +90,16 @@ brand.mean
 rownames(brand.mean) <- brand.mean[, 1]
 brand.mean <- brand.mean[, -1] 
 brand.mean
-brand.mu.pc <- prcomp(brand.mean, scale=TRUE)
+brand.mu.pc <- prcomp(brand.mean)
 
 heatmap.2(as.matrix(brand.mean),
                    col=brewer.pal(9, "GnBu"), trace="none", key=FALSE, dend="none",
                    main="\n\n\n\n\nBrand attributes")
 
 
+
 biplot(brand.mu.pc, main="Brand positioning",
        cex = 0.5)
 
 ?biplot
+
