@@ -80,7 +80,7 @@ semPaths(brand.fa.ob, what="est", residuals=FALSE,
 # PCA BI plot
 
 
-a.pca<-principal(bars[,3:15],nfactors=2)
+a.pca<-principal(bars[,3:15],nfactors=3)
 a.pca$values
 biplot(a.pca)
 plot(a.pca$values)
