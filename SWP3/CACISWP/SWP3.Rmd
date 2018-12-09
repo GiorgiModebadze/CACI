@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(message  = FALSE)
 ```
 
-Load Libraries and 
+Load Libraries and data
 
 ```{r}
 library(tidyverse)
@@ -20,9 +20,41 @@ library(skimr)
 data = read.csv("../indivData.csv")
 ```
 
-How many people own speakers and how meany of them intend to buy
+How many people own speakers and how many of them intend to buy
 ```{r}
-kable(count(data, Own, GenderLabel,IntentToBuy))
+kable(count(data, Own, GenderLabel, IntentToBuy))
 ```
+
+Check on average how people who own and do not own speaker see the importance of 
+attributes
+
+```{r}
+kable(select(data,Own,GenderLabel, starts_with("RelImp_"))%>%
+        group_by(Own,GenderLabel) %>% 
+        summarise(TotalRespodents = n(),
+            Battery = round(mean(RelImp_battery),2),
+            Price = round(mean(RelImp_price),2),
+            Sound = round(mean(RelImp_sound),2),
+            Weight = round(mean(RelImp_weight),2)))
+```
+
+Check Most Well Known brand by users gender and the status of owning one
+
+Check peoples BrandAwareness and the correlation between brands on that scale
+
+```{r}
+a = select(data, starts_with("BrandAwareness_"))
+colnames(a) = sub("BrandAwareness_", "", colnames(a))
+corBrand =cor(a)
+dist = dist(corBrand)
+scale = cmdscale(as.matrix(dist),k=2)
+colnames(scale) = c("X","Y")
+
+plot(scale, xlim = c(-2 ,1), main = "brand awarness", type = "n")
+text(scale, labels = rownames(scale), cex = 0.5)
+
+```
+
+
 
 
