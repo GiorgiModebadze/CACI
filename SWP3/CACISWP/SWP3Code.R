@@ -27,8 +27,10 @@ ggplot(data, aes(x = Age)) + geom_density()
 # all kinds of people mainly 18-24 and 25-29
 
 ## lets find occupation by age
-ggplot(data, aes(x = OccupationLabel)) + geom_bar() + facet_wrap(~Age) + 
+ggplot(data, aes(x = OccupationLabel)) + geom_bar() + facet_wrap(~AgeLabel) + 
   coord_flip()
+
+ggplot(data, aes(x = IncomeLabel)) + geom_bar() + facet_wrap(~AgeLabel) 
 
 ## most people dont own Items
 count(data, Own, GenderLabel)
@@ -36,3 +38,30 @@ count(data, Own, GenderLabel)
 ## mainly males own speakers, but also mostly males were questioned.
 count(data, Own, IntentToBuy)
 
+ImportanceMatrix = as.matrix((select(data, RelImp_battery, RelImp_price, RelImp_sound,RelImp_weight)))
+
+## For people sound is most important thing, Weight least important
+apply(ImportanceMatrix,2,mean)
+
+skim(data)
+select(data, starts_with("Subj"))
+
+## check by occupation intent to buy
+
+ggplot(data, aes(x = OccupationLabel, y = IntentToBuy)) + geom_col()
+
+## check brand avearness
+
+select(data, starts_with("BrandAwareness_")) %>% filter(BrandAwareness_None == 1)
+
+cor(select(data, starts_with("BrandAwareness_")))
+dist = dist(cor(select(data, starts_with("BrandAwareness_"))))
+scale = cmdscale(as.matrix(dist),k=2)
+colnames(scale) = c("X","Y")
+
+plot(scale, xlim = c(-2 ,2))
+text(scale, labels = rownames(scale), cex = 0.5)
+
+## to get information about how people understand brand Awareness
+
+skim(data)

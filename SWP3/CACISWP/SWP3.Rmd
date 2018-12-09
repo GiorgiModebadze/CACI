@@ -1,0 +1,28 @@
+---
+title: "SWP3"
+author: "Group 15"
+date: "9 12 2018"
+output: pdf_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message  = FALSE)
+```
+
+Load Libraries and 
+
+```{r}
+library(tidyverse)
+library(psych)
+library(skimr)
+data = read.csv("../indivData.csv")
+```
+
+How many people own speakers and how meany of them intend to buy
+```{r}
+kable(count(data, Own, GenderLabel,IntentToBuy))
+```
+
+
