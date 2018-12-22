@@ -102,3 +102,10 @@ tempdata =select(data, IntentToBuy, starts_with("BrandAwareness_"), - starts_wit
 a = tempdata[,-1] %>% rowSums(.) %>% as.tibble(.) 
 as.tibble(cbind(a$value, tempdata$IntentToBuy)) %>% mutate(V1 = as.integer(V1)) %>%
   ggplot(aes(x = V1)) +   geom_density(bw = 1) + facet_wrap(~V2)
+
+count (data,BrandAwareness_None, IntentToBuy)
+count (data,BrandAwareness_None)
+
+count(data, AgeLabel, Own,IntentToBuy)
+count(data, IncomeLabel, IntentToBuy)
+count(data, Own, IntentToBuy)
