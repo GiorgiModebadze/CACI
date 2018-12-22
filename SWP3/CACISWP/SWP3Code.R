@@ -81,3 +81,10 @@ select(data,Own,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
             Sound = round(mean(RelImp_sound),2),
             Weight = round(mean(RelImp_weight),2))
 )
+
+
+## lets check brand avareness between people
+select(data, IntentToBuy, starts_with("BrandAwareness_")) %>%
+  group_by(IntentToBuy, ) %>% summarise_all(.funs = sum)  %>%
+  rename_at(vars(starts_with("BrandAwareness_")), funs(sub("BrandAwareness_", "", .)))
+  
