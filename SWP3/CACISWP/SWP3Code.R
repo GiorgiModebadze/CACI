@@ -84,7 +84,21 @@ select(data,Own,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
 
 
 ## lets check brand avareness between people
-select(data, IntentToBuy, starts_with("BrandAwareness_")) %>%
-  group_by(IntentToBuy, ) %>% summarise_all(.funs = sum)  %>%
+select(data, IntentToBuy,OccupationLabel, starts_with("BrandAwareness_")) %>%
+  group_by(IntentToBuy,OccupationLabel ) %>% summarise_all(.funs = sum)  %>%
   rename_at(vars(starts_with("BrandAwareness_")), funs(sub("BrandAwareness_", "", .)))
-  
+
+
+library(colSums)
+
+## we can check peoples knowledge of brands and their intention to buy. if there is
+# a connection between this two factors we can draw some conclusions
+select(data,  starts_with("BrandAwareness_"), - starts_with("BrandAwareness_None")) %>% rowSums(.) %>%
+  as.tibble(.) %>% ggplot(aes(x = value )) +   geom_density(bw = 1)
+
+## intent to buy and knowledge of brands
+tempdata =select(data, IntentToBuy, starts_with("BrandAwareness_"), - starts_with("BrandAwareness_None")) %>%
+  mutate(IntentToBuy = ifelse(IntentToBuy==1, "Yes", "No")) 
+a = tempdata[,-1] %>% rowSums(.) %>% as.tibble(.) 
+as.tibble(cbind(a$value, tempdata$IntentToBuy)) %>% mutate(V1 = as.integer(V1)) %>%
+  ggplot(aes(x = V1)) +   geom_density(bw = 1) + facet_wrap(~V2)
