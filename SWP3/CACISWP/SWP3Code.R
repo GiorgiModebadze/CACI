@@ -68,3 +68,16 @@ text(scale, labels = rownames(scale), cex = 0.5)
 ## to get information about how people understand brand Awareness
 
 skim(data)
+
+
+## people who intnt to buy stuff. Their Preferences.
+library(gridExtra)
+grid.table(
+select(data,Own,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
+  group_by(Own,IntentToBuy, OccupationLabel) %>% filter(IntentToBuy == 1) %>%
+  summarise(TotalRespodents = n(),
+            Battery = round(mean(RelImp_battery),2),
+            Price = round(mean(RelImp_price),2),
+            Sound = round(mean(RelImp_sound),2),
+            Weight = round(mean(RelImp_weight),2))
+)
