@@ -47,7 +47,6 @@ select(data,Own, starts_with("RelImp_"))%>% group_by(Own) %>%
 apply(ImportanceMatrix,2,mean)
 
 skim(data)
-select(data, starts_with("Subj"))
 
 ## check by occupation intent to buy
 
@@ -109,3 +108,67 @@ count (data,BrandAwareness_None)
 count(data, AgeLabel, Own,IntentToBuy)
 count(data, IncomeLabel, IntentToBuy)
 count(data, Own, IntentToBuy)
+
+# analyzing PII
+
+PII = select(data,starts_with("PII"))
+
+head(PII)
+PIIRange
+PIIRange = cbind(PII, as.tibble(apply(PII,1, function(x) max(x)-min(x))))
+PIIRange = cbind(PIIRange, as.tibble(apply(PII,1, mean)))
+rownames(PIIRange) = data$id
+
+PIIRange[order(-PIIRange$value),]
+
+
+# analyze subject knowledge
+SubjKnowledge = select(data ,starts_with("Subj"))
+
+# as study suggests : https://www.sciencedirect.com/science/article/pii/S0148296398000575 
+# we should run PCA and FA first to determine coefficient alpha and a matrix of Pearson correlations
+
+#quote from text 
+# Item responses were factor analyzed using principal axis factoring. Coefficient 
+# alpha and a matrix of Pearson correlations were computed. Coefficient alpha for 
+# the nine items was 0.91. Only one item, number 9, reduced coefficient alpha. At
+# the same time, the factor analysis produced a solution with two factors that 
+# explained 64.1% of the variance. Items 1, 4, 5, 6, 7, and 8 formed the first 
+# factor and items 2, 3, and 9 formed the second. The two factors were correlated 
+# at 0.64. Again, item 9 was the weakest, with communality of 0.32.
+
+PCASurvey = prcomp(SubjKnowledge)
+
+scree(SubjKnowledge)
+plot(PCASurvey)
+
+# if we take a look we can say that one factor is enough for explaining all the 
+# knowledge data. meaning users were quite consistant in aswering questions
+cor(SubjKnowledge)
+factanal(SubjKnowledge, factors =2, rotation = "none")
+
+require(corrplot)
+
+rownames(SubjKnowledge) = data$id 
+
+
+
+SubjKnowledge = cbind(SubjKnowledge,as.tibble(apply(SubjKnowledge,1, function(x) max(x)-min(x))),
+                      as.tibble(apply(SubjKnowledge,1, mean)))
+
+
+SubjKnowledge$GenderLabel = data$GenderLabel
+SubjKnowledge$id = data$id
+SubjKnowledge
+colnames(SubjKnowledge)[6] = "range"
+colnames(SubjKnowledge)[7] = "average"
+
+skim(SubjKnowledge)
+
+
+# check  distribution of average by sex
+ggplot(SubjKnowledge, aes(x =GenderLabel, y = average )) + geom_boxplot() + 
+  geom_abline(intercept = median(SubjKnowledge$average), slope = 0, colour = "red",
+              linetype = "dashed", size = 1)
+# we can argue that males know more about speakers than females
+
