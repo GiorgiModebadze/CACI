@@ -1,3 +1,4 @@
+
 library(tidyverse)
 library(psych)
 library(skimr)
@@ -33,7 +34,36 @@ ggplot(data, aes(x = IncomeLabel)) + geom_bar() + facet_wrap(~AgeLabel) +
   coord_flip()
 
 ## most people dont own Items
-count(data, Own, GenderLabel, IntentToBuy)
+library(ggthemes)
+tempf = count(data, Own, GenderLabel, IntentToBuy)
+tempf$IntentToBuy = as.factor(tempf$IntentToBuy)
+tempf$Own = as.factor(tempf$Own)
+tempf
+levels(tempf$IntentToBuy) = c("No","Yes")
+levels(tempf$Own) = c("Own - No","Own - Yes")
+tempf = mutate(tempf, prc = round(prop.table(n) * 100))
+tempf
+
+
+plt = ggplot(tempf, aes(x = GenderLabel, y= n, fill = as.factor(IntentToBuy))) + 
+  geom_col(width=.5, position = "dodge") + theme_excel_new() +
+  facet_grid(. ~ Own) +
+  labs(title = "Own Vs Intention to buy by Gender",
+       caption = "The percentages on the bars represent share of each bar in total count") +
+  scale_fill_manual(values=c( "#E69F00","#56B4E9"),
+                    name="Intent To Buy",
+                    breaks=c("No", "Yes"),
+                    labels=c("No", "Yes")) + 
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        legend.title = element_text(size = 10)) +
+  geom_text(aes(y = n/2,    # nudge above top of bar
+                label = paste0(prc, '%')),    # prettify
+            position = position_dodge(width = .5), 
+            size = 2.5)
+       
+ggsave("~/Desktop/one.png",plt,dpi = 320)
 
 ## mainly males own speakers, but also mostly males were questioned.
 count(data, Own, IntentToBuy)
