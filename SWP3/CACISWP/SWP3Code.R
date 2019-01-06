@@ -63,7 +63,7 @@ plt = ggplot(tempf, aes(x = GenderLabel, y= n, fill = as.factor(IntentToBuy))) +
             position = position_dodge(width = .5), 
             size = 2.5)
        
-ggsave("~/Desktop/one.png",plt,dpi = 320)
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/one.png",plt,dpi = 320, height = 100, units = "mm")
 
 ## mainly males own speakers, but also mostly males were questioned.
 count(data, Own, IntentToBuy)
