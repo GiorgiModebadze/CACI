@@ -96,8 +96,9 @@ corBrand =cor(a)
 dist = dist(corBrand)
 scale = cmdscale(as.matrix(dist),k=2)
 colnames(scale) = c("X","Y")
+scale
 
-plot(scale, xlim = c(-2 ,2), main = "brand awarness", type = "n")
+plot(scale, main = "brand awarness", type = "n")
 text(scale, labels = rownames(scale), cex = 0.5)
 
 ## to get information about how people understand brand Awareness
@@ -246,12 +247,24 @@ plot(PCASurvey)
 # if we take a look we can say that one factor is enough for explaining all the 
 # knowledge data. meaning users were quite consistant in aswering questions
 cor(SubjKnowledge)
-factanal(SubjKnowledge, factors =2, rotation = "none")
+
+tempFactAnal = factanal(SubjKnowledge, factors =2, rotation="oblimin")
+semPaths(tempFactAnal, what="est", residuals=FALSE,
+         cut=0.3, posCol=c("white", "darkgreen"), negCol=c("white", "red"),
+         edge.label.cex=0.75, nCharNodes=7)
+tempFactAnal
+# Using factor Analysis we can see that Two factors are sufficient to explain
+# 72% of the variation, Intrestingly enough Question number three was only question
+# that differed from others 
+boxplot(SubjKnowledge)
+
+# using boxplot we can clearly see that people are less confident when they considering
+# themselves as experts between experts 
 
 require(corrplot)
+corrplot(cor(SubjKnowledge))
 
 rownames(SubjKnowledge) = data$id 
-
 
 
 SubjKnowledge = cbind(SubjKnowledge,as.tibble(apply(SubjKnowledge,1, function(x) max(x)-min(x))),
@@ -268,8 +281,18 @@ skim(SubjKnowledge)
 
 
 # check  distribution of average by sex
-ggplot(SubjKnowledge, aes(x =GenderLabel, y = average )) + geom_boxplot() + 
+SubjKnowledgeByGender = ggplot(SubjKnowledge, aes(x =GenderLabel, y = average )) + geom_boxplot() + 
   geom_abline(intercept = median(SubjKnowledge$average), slope = 0, colour = "red",
-              linetype = "dashed", size = 1)
+              linetype = "dashed", size = 1) + theme_excel_new()+
+  labs(title = "Subject Knowledge by Gender") + 
+  theme(plot.subtitle = element_text(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        legend.title = element_text(size = 10))
+ 
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/SubjKnowledgeByGender.png",
+       SubjKnowledgeByGender,dpi = 320, height = 150, units = "mm")
+
 # we can argue that males know more about speakers than females
 
