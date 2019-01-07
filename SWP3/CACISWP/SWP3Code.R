@@ -62,6 +62,8 @@ plt = ggplot(tempf, aes(x = GenderLabel, y= n, fill = as.factor(IntentToBuy))) +
                 label = paste0(prc, '%')),    # prettify
             position = position_dodge(width = .5), 
             size = 2.5)
+
+plt
        
 ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/one.png",plt,dpi = 320, height = 100, units = "mm")
 
@@ -101,16 +103,41 @@ skim(data)
 
 ## people who intnt to buy stuff. Their Preferences.
 library(gridExtra)
-grid.table(
-select(data,Own,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
-  group_by(Own,IntentToBuy, OccupationLabel) %>% filter(IntentToBuy == 1) %>%
-  summarise(TotalRespodents = n(),
-            Battery = round(mean(RelImp_battery),2),
-            Price = round(mean(RelImp_price),2),
-            Sound = round(mean(RelImp_sound),2),
-            Weight = round(mean(RelImp_weight),2))
-)
 
+relImportance = select(data,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
+  group_by(IntentToBuy, OccupationLabel)  %>% filter (OccupationLabel != "Retired") %>%
+  summarise(TotalRespodents = n(),
+            Battery = round(mean(RelImp_battery)),
+            Price = round(mean(RelImp_price)),
+            Sound = round(mean(RelImp_sound)),
+            Weight = round(mean(RelImp_weight))) %>%
+  gather("Attribute", "Value", 4:7)
+
+relImportance$IntentToBuy = as.factor(relImportance$IntentToBuy)
+levels(relImportance$IntentToBuy) = c("Intent to Buy - No", "Intent to Buy - Yes")
+relImportance
+
+plt2 = ggplot(relImportance, aes(x = OccupationLabel, y = Value, fill = factor(Attribute))) + 
+  geom_col(position = "dodge") +   theme_excel_new() +
+  facet_grid(IntentToBuy ~. ) +
+  geom_text(aes(y = Value/2,    # nudge above top of bar
+                    label = paste0(Value, '%')),    # prettify
+                    position = position_dodge(width = .9), 
+                    size = 2.5) +
+  labs(title = "Relative Importance of Features",
+       subtitle = "By Ocupational Status and Intention to buy new product"
+       ) + 
+  scale_fill_manual(values=c( "#E69F00","#56B4E9", "#00b37c","#9f00e6"),
+                    name="Attribute",
+                    breaks=c("Battery", "Price", "Sound", "Weight"),
+                    labels=c("Battery", "Price", "Sound", "Weight")) +
+  theme(plot.subtitle = element_text(),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        legend.title = element_text(size = 10))
+
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/two.png",plt2,dpi = 320, height = 150, units = "mm")
 
 ## lets check brand avareness between people
 select(data, IntentToBuy,OccupationLabel, starts_with("BrandAwareness_")) %>%
