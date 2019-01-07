@@ -3,9 +3,12 @@ library(tidyverse)
 library(psych)
 library(skimr)
 data = read.csv("../indivData.csv")
-
-skim(data)
-head(data)
+data$IncomeLabel =  gsub("\x80",replacement = "",x = data$IncomeLabel)
+data$IncomeLabel = ordered(data$IncomeLabel, levels = c("<500","501-1000","1001-1500",
+                                                          "1501-2000","2001-2500","2501-3000",
+                                                          ">=3001","rather not say"))
+data
+distinct(data,IncomeLabel)
 
 #lets do some exploratory data anaylsis
 
@@ -35,20 +38,21 @@ ggplot(data, aes(x = IncomeLabel)) + geom_bar() + facet_wrap(~AgeLabel) +
 
 ## most people dont own Items
 library(ggthemes)
-tempf = count(data, Own, GenderLabel, IntentToBuy)
+
+tempf = count(data, Own, IncomeLabel, IntentToBuy)
 tempf$IntentToBuy = as.factor(tempf$IntentToBuy)
 tempf$Own = as.factor(tempf$Own)
-tempf
+tempf$IncomeLabel
 levels(tempf$IntentToBuy) = c("No","Yes")
 levels(tempf$Own) = c("Own - No","Own - Yes")
 tempf = mutate(tempf, prc = round(prop.table(n) * 100))
-tempf
+str(tempf)
 
 
-plt = ggplot(tempf, aes(x = GenderLabel, y= n, fill = as.factor(IntentToBuy))) + 
-  geom_col(width=.5, position = "dodge") + theme_excel_new() +
-  facet_grid(. ~ Own) +
-  labs(title = "Own Vs Intention to buy by Gender",
+plt = ggplot(tempf, aes(x = IncomeLabel, y= n, fill = as.factor(IntentToBuy))) + 
+  geom_col(width=.7, position = "dodge") + theme_excel_new() +
+  facet_grid(. ~ Own) + coord_flip() +
+  labs(title = "Own Vs Intention to buy by Income Level",
        caption = "The percentages on the bars represent share of each bar in total count") +
   scale_fill_manual(values=c( "#E69F00","#56B4E9"),
                     name="Intent To Buy",
@@ -65,7 +69,7 @@ plt = ggplot(tempf, aes(x = GenderLabel, y= n, fill = as.factor(IntentToBuy))) +
 
 plt
        
-ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/one.png",plt,dpi = 320, height = 100, units = "mm")
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/Three.png",plt,dpi = 320, height = 150, units = "mm")
 
 ## mainly males own speakers, but also mostly males were questioned.
 count(data, Own, IntentToBuy)
@@ -85,7 +89,7 @@ skim(data)
 ggplot(data, aes(x = OccupationLabel, y = IntentToBuy)) + geom_col()
 
 ## check brand avearness
-
+a
 a = select(data, starts_with("BrandAwareness_"))
 colnames(a) = sub("BrandAwareness_", "", colnames(a))
 corBrand =cor(a)
@@ -97,9 +101,49 @@ plot(scale, xlim = c(-2 ,2), main = "brand awarness", type = "n")
 text(scale, labels = rownames(scale), cex = 0.5)
 
 ## to get information about how people understand brand Awareness
+install.packages("wesanderson")
+library(wesanderson)
+tempb = select(data, IncomeLabel,OccupationLabel, starts_with("BrandAwareness_")) %>%
+  gather("Manufacturer",value = "Know",3:11) %>% 
+  mutate(Manufacturer = gsub(pattern = "BrandAwareness_", "", Manufacturer) ) %>%
+  filter(OccupationLabel != "Retired") 
 
-skim(data)
+tempTotal  = tempb %>% summarise(sum(Know))
+tempTotal
+prc = tempb %>% group_by(Manufacturer) %>% summarise(prc = sum(Know)/tempTotal$`sum(Know)` * 100)
 
+library(plotly)
+
+plot_ly(tempb, labels = ~Manufacturer, values = ~Know, type = 'pie',textposition = 'outside',textinfo = 'label+percent') %>%
+  layout(showlegend = FALSE,
+         title = 'Brand Awareness',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+brandAwarenessByOccplt = ggplot(tempb, aes(x = Manufacturer,  y = Know, fill = Manufacturer)) + geom_bar(stat="identity") +
+  facet_wrap(~OccupationLabel) + theme_excel_new() + coord_flip() +
+  scale_fill_brewer(palette="Set1") +
+  labs(title = "Brand Awareness By Occupational Status") + 
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        legend.title = element_text(size = 10))
+
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/brandAwarenessByOccplt.png",
+       brandAwarenessByOccplt,dpi = 320, height = 150, units = "mm")
+
+
+
+# ggplot(tempb, aes(x = "a" ,y = Know, fill= factor(Manufacturer))) +
+#   geom_bar(width = 1, stat = "identity") +
+#   coord_polar("y", start=0) + 
+#   labs(x = NULL, y = NULL, fill = NULL, title = "By Brand") +
+#   theme_classic()  +
+#   theme(axis.line = element_blank(),
+#         axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         plot.title = element_text(hjust = 0.5, color = "#666666")) +
+#   scale_fill_brewer(palette="Set1") 
 
 ## people who intnt to buy stuff. Their Preferences.
 library(gridExtra)
