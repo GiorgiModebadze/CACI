@@ -128,8 +128,9 @@ text(scale, labels = rownames(scale), cex = 0.5)
 ## to get information about how people understand brand Awareness
 install.packages("wesanderson")
 library(wesanderson)
-tempb = select(data, IncomeLabel,OccupationLabel, starts_with("BrandAwareness_")) %>%
-  gather("Manufacturer",value = "Know",3:11) %>% 
+tempb = select(data, GenderLabel, IncomeLabel,OccupationLabel, starts_with("BrandAwareness_")) %>%
+  filter(GenderLabel != "Prefer not to answer") %>%
+  gather("Manufacturer",value = "Know",4:12) %>% 
   mutate(Manufacturer = gsub(pattern = "BrandAwareness_", "", Manufacturer) ) %>%
   filter(OccupationLabel != "Retired") 
 
@@ -139,21 +140,29 @@ prc = tempb %>% group_by(Manufacturer) %>% summarise(prc = sum(Know)/tempTotal$`
 
 library(plotly)
 
+tempb
 plot_ly(tempb, labels = ~Manufacturer, values = ~Know, type = 'pie',textposition = 'outside',textinfo = 'label+percent') %>%
   layout(showlegend = FALSE,
          title = 'Brand Awareness',
          xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
          yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
-brandAwarenessByOccplt = ggplot(tempb, aes(x = Manufacturer,  y = Know, fill = Manufacturer)) + geom_bar(stat="identity") +
-  facet_wrap(~OccupationLabel) + theme_excel_new() + coord_flip() +
+
+library(scales)
+brandAwarenessByOccplt = ggplot(tempb, aes(x = "",  y = Know, fill = Manufacturer)) + geom_bar(stat="identity", position = "fill") +
+  facet_grid(GenderLabel~OccupationLabel) +coord_polar("y", start=0) + 
+
   scale_fill_brewer(palette="Set1") +
   labs(title = "Brand Awareness By Occupational Status") + 
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_text(size = 7),
+  theme(axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        legend.title = element_text(size = 10))
+        panel.border = element_blank(),
+        panel.grid=element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x=element_blank()) 
 
+brandAwarenessByOccplt
 ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/brandAwarenessByOccplt.png",
        brandAwarenessByOccplt,dpi = 320, height = 150, units = "mm")
 
@@ -173,28 +182,29 @@ ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/brandAwarenessByOccplt.
 ## people who intnt to buy stuff. Their Preferences.
 library(gridExtra)
 
-relImportance = select(data,IntentToBuy, OccupationLabel, starts_with("RelImp_"))%>%
-  group_by(IntentToBuy, OccupationLabel)  %>% filter (OccupationLabel != "Retired") %>%
+relImportance = select(data,IntentToBuy, GenderLabel, OccupationLabel, starts_with("RelImp_"))%>%
+  group_by(IntentToBuy, OccupationLabel, GenderLabel)  %>% 
+  filter (OccupationLabel != "Retired", GenderLabel != "Prefer not to answer") %>%
   summarise(TotalRespodents = n(),
             Battery = round(mean(RelImp_battery)),
             Price = round(mean(RelImp_price)),
             Sound = round(mean(RelImp_sound)),
             Weight = round(mean(RelImp_weight))) %>%
-  gather("Attribute", "Value", 4:7)
-
+  gather("Attribute", "Value", 5:8)
+relImportance
 relImportance$IntentToBuy = as.factor(relImportance$IntentToBuy)
 levels(relImportance$IntentToBuy) = c("Intent to Buy - No", "Intent to Buy - Yes")
 relImportance
 
 plt2 = ggplot(relImportance, aes(x = OccupationLabel, y = Value, fill = factor(Attribute))) + 
-  geom_col(position = "dodge") +   theme_excel_new() +
-  facet_grid(IntentToBuy ~. ) +
+  geom_col(position = "dodge") +
+  facet_grid(GenderLabel ~ IntentToBuy) +
   geom_text(aes(y = Value/2,    # nudge above top of bar
                     label = paste0(Value, '%')),    # prettify
                     position = position_dodge(width = .9), 
                     size = 2.5) +
   labs(title = "Relative Importance of Features",
-       subtitle = "By Ocupational Status and Intention to buy new product"
+       subtitle = "By Ocupational Status, Gender and Intention to buy new product"
        ) + 
   scale_fill_manual(values=c( "#E69F00","#56B4E9", "#00b37c","#9f00e6"),
                     name="Attribute",
@@ -206,7 +216,10 @@ plt2 = ggplot(relImportance, aes(x = OccupationLabel, y = Value, fill = factor(A
         axis.title.y = element_blank(),
         legend.title = element_text(size = 10))
 
-ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/two.png",plt2,dpi = 320, height = 150, units = "mm")
+plt2
+
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/two.png",
+       plt2,dpi = 320, height = 150, width = 250,units = "mm")
 
 ## lets check brand avareness between people
 select(data, IntentToBuy,OccupationLabel, starts_with("BrandAwareness_")) %>%
