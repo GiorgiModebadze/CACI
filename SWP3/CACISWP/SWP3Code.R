@@ -3,6 +3,7 @@ library(tidyverse)
 library(psych)
 library(skimr)
 library(ggthemes)
+library(cowplot)
 data = read.csv("../indivData.csv")
 data$IncomeLabel =  gsub("\x80",replacement = "",x = data$IncomeLabel)
 data$IncomeLabel = ordered(data$IncomeLabel, levels = c("<500","501-1000","1001-1500",
@@ -10,6 +11,7 @@ data$IncomeLabel = ordered(data$IncomeLabel, levels = c("<500","501-1000","1001-
                                                           ">=3001","rather not say"))
 
 distinct(data,IncomeLabel)
+
 
 #lets do some exploratory data anaylsis
 
@@ -113,8 +115,10 @@ skim(data)
 ggplot(data, aes(x = OccupationLabel, y = IntentToBuy)) + geom_col()
 
 ## check brand avearness
-a
+apply(a,2,sum)
 a = select(data, starts_with("BrandAwareness_"))
+a$intentionToBuy = data$IntentToBuy
+a = a %>% filter(intentionToBuy == 1)
 colnames(a) = sub("BrandAwareness_", "", colnames(a))
 corBrand =cor(a)
 dist = dist(corBrand)
@@ -166,6 +170,49 @@ brandAwarenessByOccplt
 ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/brandAwarenessByOccplt.png",
        brandAwarenessByOccplt,dpi = 320, height = 150, units = "mm")
 
+tempb
+# try two
+tempb
+BrandAwarenesOverall = ggplot(tempb, aes(x = Manufacturer, y = Know, fill = Manufacturer)) + 
+  geom_bar(stat="identity") +
+  ylim(0, 600) + theme_excel_new() + facet_grid(.~GenderLabel)+
+  labs(title = "Brand Awareness") +
+  geom_hline(yintercept = 593, color = "red") + scale_fill_brewer(palette="Set1")
+BrandAwarenesOverall
+
+tempd = tempb %>% group_by(GenderLabel,Manufacturer) %>% summarise(tot = sum(Know))
+
+tempc = tempd%>% group_by(GenderLabel) %>% summarise(tot = sum(tot))
+
+tempe = left_join(tempd, tempc,"GenderLabel") %>% mutate( prc = tot.x / tot.y *100)
+
+brand =  ggplot(tempe,aes(x = Manufacturer, y = prc, fill= Manufacturer)) +geom_col() + facet_wrap(.~GenderLabel) +
+  coord_flip() + theme_excel_new() +scale_fill_brewer(palette="Set1") +
+  labs(title = "Brand Awareness by Gender (Percentage)")
+
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/brand.png",
+       brand,dpi = 320, height = 150, width = 250,units = "mm")
+
+
+
+# by occupation
+tempz = tempb %>% group_by(OccupationLabel,Manufacturer) %>% summarise(tot = sum(Know))
+
+tempx = tempz%>% group_by(OccupationLabel) %>% summarise(tot = sum(tot))
+
+tempy = left_join(tempx, tempz,"OccupationLabel") %>% mutate( prc = tot.y / tot.x *100)
+tempy
+
+brandOcc =  ggplot(tempy,aes(x = Manufacturer, y = prc, fill= Manufacturer)) +geom_col() + 
+  facet_wrap(.~OccupationLabel) +
+  coord_flip() + theme_excel_new() +scale_fill_brewer(palette="Set1") +
+  labs(title = "Brand Awareness by Occupation (Percentage)")
+
+brandOcc
+
+res = cowplot::plot_grid(brand,brandOcc)
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/res.png",
+       res,dpi = 320, height = 100, width = 250,units = "mm")
 
 
 # ggplot(tempb, aes(x = "a" ,y = Know, fill= factor(Manufacturer))) +
@@ -229,6 +276,7 @@ select(data, IntentToBuy,OccupationLabel, starts_with("BrandAwareness_")) %>%
 
 library(colSums)
 
+
 ## we can check peoples knowledge of brands and their intention to buy. if there is
 # a connection between this two factors we can draw some conclusions
 select(data,  starts_with("BrandAwareness_"), - starts_with("BrandAwareness_None")) %>% rowSums(.) %>%
@@ -259,6 +307,9 @@ PIIRange = cbind(PIIRange, as.tibble(apply(PII,1, mean)))
 rownames(PIIRange) = data$id
 
 PIIRange[order(-PIIRange$value),]
+factanal(PII,factors = 2, rotation = "oblimin")
+
+apply(PII, 2, mean)
 
 
 # analyze subject knowledge
@@ -280,15 +331,19 @@ PCASurvey = prcomp(SubjKnowledge)
 
 scree(SubjKnowledge)
 plot(PCASurvey)
+boxplot(SubjKnowledge)
 
+apply(SubjKnowledge,2, mean)
 # if we take a look we can say that one factor is enough for explaining all the 
 # knowledge data. meaning users were quite consistant in aswering questions
 cor(SubjKnowledge)
-
+library(GPArotation)
 tempFactAnal = factanal(SubjKnowledge, factors =2, rotation="oblimin")
+tempFactAnal
 semPaths(tempFactAnal, what="est", residuals=FALSE,
          cut=0.3, posCol=c("white", "darkgreen"), negCol=c("white", "red"),
          edge.label.cex=0.75, nCharNodes=7)
+
 tempFactAnal
 # Using factor Analysis we can see that Two factors are sufficient to explain
 # 72% of the variation, Intrestingly enough Question number three was only question
@@ -309,12 +364,23 @@ SubjKnowledge = cbind(SubjKnowledge,as.tibble(apply(SubjKnowledge,1, function(x)
 
 
 SubjKnowledge$GenderLabel = data$GenderLabel
+SubjKnowledge$IntentToBuy = data$IntentToBuy
+SubjKnowledge$OccupationLabel = data$OccupationLabel
 SubjKnowledge$id = data$id
 SubjKnowledge
 colnames(SubjKnowledge)[6] = "range"
 colnames(SubjKnowledge)[7] = "average"
+SubjKnowledge
+SubjKnowledge
+SubjKnowledgeGathered = SubjKnowledge %>% filter(GenderLabel != "Prefer not to answer") %>%
+  gather(key = "Know", value = "dt", 1:5)
+SubjKnowledgeGathered
 
+ggplot(SubjKnowledgeGathered, aes(x = as.factor(Know), y = dt)) + 
+  geom_boxplot() + facet_grid(.~OccupationLabel) + coord_flip()
+SubjKnowledge
 skim(SubjKnowledge)
+cor(SubjKnowledge$id, SubjKnowledge$IntentToBuy)
 
 
 # check  distribution of average by sex
@@ -327,9 +393,17 @@ SubjKnowledgeByGender = ggplot(SubjKnowledge, aes(x =GenderLabel, y = average ))
         axis.text.x = element_text(size = 7),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 10))
- 
+
 ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/SubjKnowledgeByGender.png",
        SubjKnowledgeByGender,dpi = 320, height = 150, units = "mm")
 
 # we can argue that males know more about speakers than females
 
+#own
+
+count(data, IntentToBuy,IncomeLabel) %>% spread(key = IntentToBuy, value = n) %>%
+  mutate(prc = `1`/(`1`+`0`))
+
+count(data, IntentToBuy, Own) %>% filter(IntentToBuy == 1) %>% mutate(n/sum(n))
+
+         
