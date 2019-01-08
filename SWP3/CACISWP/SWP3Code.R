@@ -2,12 +2,13 @@
 library(tidyverse)
 library(psych)
 library(skimr)
+library(ggthemes)
 data = read.csv("../indivData.csv")
 data$IncomeLabel =  gsub("\x80",replacement = "",x = data$IncomeLabel)
 data$IncomeLabel = ordered(data$IncomeLabel, levels = c("<500","501-1000","1001-1500",
                                                           "1501-2000","2001-2500","2501-3000",
                                                           ">=3001","rather not say"))
-data
+
 distinct(data,IncomeLabel)
 
 #lets do some exploratory data anaylsis
@@ -19,13 +20,36 @@ count( IncomeLabel,IntentToBuy)
 
 ## lets check income distribution
 
-ggplot(data, aes(x = Income)) + geom_density()
+IncomeByOccupation = ggplot(data, aes(x = IncomeLabel, col = OccupationLabel)) + 
+  geom_bar(stat="count") +
+  theme_excel_new() +
+  labs(title = "Income by occupation") + 
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 5),
+        axis.title.y = element_blank(),
+        legend.text = element_text(size = 5)) +
+    scale_fill_brewer(palette="Set3")  
+
+IncomeByOccupation
+ggsave("/Users/Raviky/Documents/GitHub/CACI/SWP3/CACISWP/IncomeByOccupation.png",
+       IncomeByOccupation,dpi = 320, height = 50, width = 100, units = "mm")
 
 ##  how they are occupied by gender
-count(data, OccupationLabel, GenderLabel)
 
+
+tempOcc = count(data, OccupationLabel)
+tempOccInc = count(data, IncomeLabel, OccupationLabel)
+
+tb  = left_join(tempOccInc,tempOcc,"OccupationLabel") %>% 
+  mutate(prc = paste0(round(n.x/n.y * 100), "%")) %>%
+  select (IncomeLabel, OccupationLabel, prc) %>% 
+  spread( key= IncomeLabel, value = prc)
+tb[is.na(tb)] = "0%"
+tb
+grid.newpage()
+grid.table(tb)
 ## lets check age
-ggplot(data, aes(x = Age)) + geom_density()
+ggplot(data, aes(x = Age)) + geom_density() 
 
 # all kinds of people mainly 18-24 and 25-29
 
