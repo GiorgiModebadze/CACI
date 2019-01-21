@@ -3,7 +3,7 @@ setwd("C:/Users/klapperd/Dropbox/Humboldt/Lehre/CACI/WS1819/Data")
 library(mlogit)
 library(data.table)
 
-data.cbc<-read.csv("cbc_data.csv")
+data.cbc<-read.csv("../cbc_data.csv")
 data.cbc$price<-data.cbc$price/100
 head(data.cbc,8)
 str(data.cbc)
