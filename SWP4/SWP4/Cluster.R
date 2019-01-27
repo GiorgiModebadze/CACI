@@ -33,5 +33,5 @@ clust1 = cluster(cluster1)
 clust2 = cluster(cluster2)
 clust3 = cluster(cluster3)
 clust4 = cluster(cluster4)
-
-
+clust1
+cbind(clust1,clust2,clust3, clust4)
