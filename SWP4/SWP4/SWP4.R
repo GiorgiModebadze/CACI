@@ -104,4 +104,5 @@ cleanData = cleanData %>% mutate(battery.16h = ifelse(alt ==4 ,
                                  sound.5.0s =  ifelse(alt == 4,
                                                    0, sound.5.0s ))
 
-cleanData
+
+data
