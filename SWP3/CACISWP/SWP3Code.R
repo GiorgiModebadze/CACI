@@ -4,6 +4,7 @@ library(psych)
 library(skimr)
 library(ggthemes)
 library(cowplot)
+library(gridExtra)
 data = read.csv("../indivData.csv")
 data$IncomeLabel =  gsub("\x80",replacement = "",x = data$IncomeLabel)
 data$IncomeLabel = ordered(data$IncomeLabel, levels = c("<500","501-1000","1001-1500",

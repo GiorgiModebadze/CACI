@@ -3,7 +3,8 @@ library(klaR)
 library(mlr)
 library(cluster)
 length(bluetooth)
-selected = bluetooth %>% select(13:26)
+selected = bluetooth %>% dplyr::select(13:26)
+bluetooth = data
 bluetooth
 selected
 
@@ -50,5 +51,9 @@ table(seg.hc.segment)
 seg.hc.segment
 seg.hc.segment
 
+cbind(seg.hc.segment, data) %>% dplyr::select(seg.hc.segment, id)
+
+  write.csv(cbind(seg.hc.segment, data) %>% dplyr::select(seg.hc.segment, id), "~/Documents/GitHub/CACI/SWP4//Clusters.csv",row.names = F,
+            quote = F)
 
 seg.summ(bluetooth, seg.hc.segment)[,24:37]
