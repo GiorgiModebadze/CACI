@@ -2,15 +2,25 @@ setwd("C:/Users/klapperd/Dropbox/Humboldt/Lehre/CACI/WS1819/Data")
 #install.packages('mlogit')
 library(mlogit)
 library(data.table)
-data.c
-data.cbc<-cleandb
+
+data.cbc<-cleanData
+head(cleanWithout0)
 data.cbc$price<-data.cbc$price/100
-head(data.cbc,8)
+head(data.cbc,20)
 str(data.cbc)
 data_ml_bluetooth <- mlogit.data(data.cbc, choice = "choice", shape = "long",
                                  id.var = "id", alt.var = "alt")
 
+colnames(data.cbc)
 mnl_bluetooth = mlogit(choice ~ -1 + none + price + battery + sound + weight, data = data_ml_bluetooth)
+
+mnl_bluetooth = mlogit(choice ~ -1 + none + price + 
+                        battery.10h + battery.12h + battery.14h+ battery.16h+ battery.8h+ weight.400g +
+                       weight.500g + weight.600g + weight.700g + sound.3.5s + sound.4.0s +  sound.4.5s + 
+                        sound.5.0s , data = data_ml_bluetooth)
+
+
+
 summary(mnl_bluetooth)
 
 head(data_ml_bluetooth)
@@ -30,21 +40,5 @@ mnl_bluetooth$coefficients
 
 data %>% filter(id == 134)
 
-
-# battery1 	8 hours
-# battery2	10 hours
-# battery3	12 hours
-# battery4    	14 hours
-# 16 hours  (omitted level)
-# 
-# weight1		400 grams
-# weight2		500 grams
-# weight3		600 grams
-# 700 grams (omitted level)
-# 
-# sound1		3.5 stars
-# sound2		4.0 stars
-# sound3		4.5 stars
-# 5.0 stars (omitted level)
 
 

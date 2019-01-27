@@ -47,20 +47,6 @@ temptb %>% group_by(id, a) %>% summarise( n = n()) %>% arrange(desc(n)) %>%
 temptb %>% group_by(a) %>% summarise( c = n()) %>% arrange(desc(c))
 
 
-xtabs(choice ~ battery1, data = data)
-xtabs(choice ~ battery2, data = data)
-xtabs(choice ~ battery3, data = data)
-xtabs(choice ~ battery4, data = data)
-
-xtabs(choice ~ sound1, data = data)
-xtabs(choice ~ sound2, data = data)
-xtabs(choice ~ sound3, data = data)
-
-xtabs(choice ~ weight1, data = data)
-xtabs(choice ~ weight2, data = data)
-xtabs(choice ~ weight3, data = data)
-
-
 ## row choice counts
 filter(data, choice==1) %>% count(price)
 filter(data, choice==1) %>% count(battery1)
@@ -77,3 +63,45 @@ a = data %>% filter(choice == 1) %>% group_by(id, alt) %>% summarise(n = n()) %>
 
 
 
+
+# battery1 	8 hours
+# battery2	10 hours
+# battery3	12 hours
+# battery4    	14 hours
+# 16 hours  (omitted level)
+# 
+# weight1		400 grams
+# weight2		500 grams
+# weight3		600 grams
+# 700 grams (omitted level)
+# 
+# sound1		3.5 stars
+# sound2		4.0 stars
+# sound3		4.5 stars
+# 5.0 stars (omitted level)
+
+
+cleanWithout0 = cleandb %>% mutate(battery = ifelse(alt ==4 , 
+                                          0, battery ),
+                                   weight =  ifelse(alt == 4,
+                                                    0, weight ),
+                                   sound =  ifelse(alt == 4,
+                                                   0, sound )) %>%
+  mutate(battery = as.factor(battery), weight = as.factor(weight),
+         sound = as.factor(sound))
+  
+
+
+cleanData = cleandb      
+library(mlr)
+cleanData = mlr::createDummyFeatures(cleanData)
+cleanData
+
+cleanData = cleanData %>% mutate(battery.16h = ifelse(alt ==4 , 
+                                                    0, battery.16h ),
+                                 weight.700g =  ifelse(alt == 4,
+                                                    0, weight.700g ),
+                                 sound.5.0s =  ifelse(alt == 4,
+                                                   0, sound.5.0s ))
+
+cleanData
